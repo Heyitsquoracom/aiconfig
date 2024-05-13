@@ -36,7 +36,7 @@ jobs:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             {
-              "text": "Headsup - The python-sdk has been version bumped and published to pypi",
+              "text": "Headsup - The python-sdk has been version bumped and published to pypi"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

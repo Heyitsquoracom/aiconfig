@@ -19,7 +19,7 @@ sidebar_position: 10
 | Meta | **Llama 2** | Python | 🤝 [Extension](https://github.com/lastmile-ai/aiconfig/tree/main/extensions/llama/python) |
 | Meta | **Llama 2** | Typescript | 🤝 [Extension](https://github.com/lastmile-ai/aiconfig/tree/main/extensions/llama/typescript) |
 | Meta | **Llama Guard** | Python | 🤝 [Extension](https://github.com/lastmile-ai/aiconfig/tree/main/extensions/llama/typescript) |
-| HuggingFace Transformer Pipelines | **Text Generation** | Python | 🤝 [Extension](https://github.com/lastmile-ai/aiconfig/tree/main/extensions/HuggingFaceTransformers/python) |
+| HuggingFace Transformer Pipelines | **Text Generation** | Python | 🤝 [Extension](https://github.com/lastmile-ai/aiconfig/tree/main/extensions/HuggingFace/python) |
 
 :::info
 We plan on keeping core `aiconfig` lightweight so it doesn't become a monolithic project. We recommend using AIConfig extensions to expand support for additional models and functionality.

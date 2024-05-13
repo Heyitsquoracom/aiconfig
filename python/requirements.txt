@@ -8,7 +8,7 @@ frozendict
 google-generativeai>=0.3.1
 huggingface-hub >= 0.20.3, <= 0.21.4
 hypothesis==6.91.0
-lastmile-utils==0.0.23
+lastmile-utils==0.0.24
 nest_asyncio
 nltk
 openai >= 1.13.3
