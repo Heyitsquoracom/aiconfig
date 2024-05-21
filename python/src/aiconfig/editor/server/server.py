@@ -1,18 +1,21 @@
 import asyncio
 import copy
 import ctypes
-import dotenv
 import json
 import logging
 import threading
 import time
 import uuid
 import webbrowser
-import os
 from typing import Any, Dict, Literal, Type, Union
 
+import dotenv
 import lastmile_utils.lib.core.api as core_utils
 import result
+from flask import Flask, Response, request, stream_with_context
+from flask_cors import CORS
+from result import Err, Ok, Result
+
 from aiconfig.Config import AIConfigRuntime
 from aiconfig.editor.server.queue_iterator import (
     STOP_STREAMING_SIGNAL,
@@ -42,10 +45,6 @@ from aiconfig.editor.server.server_utils import (
 )
 from aiconfig.model_parser import InferenceOptions
 from aiconfig.registry import ModelParserRegistry
-from flask import Flask, Response, request, stream_with_context
-from flask_cors import CORS
-from result import Err, Ok, Result
-
 from aiconfig.schema import ExecuteResult, Output, Prompt, PromptMetadata
 
 logging.getLogger("werkzeug").disabled = True
@@ -338,7 +337,7 @@ def run() -> FlaskResponse:
     # Execution time of `0.001s` is arbitrary, but should be small enough to not be noticeable.
     # Override if env_file_path is specified, user expects provided .env values take precedence over existing values
     override_behaviour = state.env_file_path is not None
-    dotenv.load_dotenv(state.env_file_path, override = override_behaviour)
+    dotenv.load_dotenv(state.env_file_path, override=override_behaviour)
 
     aiconfig = state.aiconfig
     request_json = request.get_json()
@@ -633,6 +632,21 @@ def update_prompt() -> FlaskResponse:
     )
 
 
+@app.route("/api/delete_model", methods=["POST"])
+def delete_model() -> FlaskResponse:
+    method_name = MethodName("delete_model")
+    signature: dict[str, Type[Any]] = {"model_name": str}
+
+    state = get_server_state(app)
+    aiconfig = state.aiconfig
+    request_json = request.get_json()
+
+    operation = make_op_run_method(method_name)
+    return run_aiconfig_operation_with_request_json(
+        aiconfig, request_json, f"method_{method_name}", operation, signature
+    )
+
+
 @app.route("/api/delete_prompt", methods=["POST"])
 def delete_prompt() -> FlaskResponse:
     method_name = MethodName("delete_prompt")
@@ -773,6 +787,7 @@ def clear_outputs() -> FlaskResponse:
     """
     Clears all outputs in the server state's AIConfig.
     """
+    method_name = MethodName("clear_outputs")
     state = get_server_state(app)
     aiconfig = state.aiconfig
     request_json = request.get_json()
@@ -796,7 +811,32 @@ def clear_outputs() -> FlaskResponse:
 
     signature: dict[str, Type[Any]] = {}
     return run_aiconfig_operation_with_request_json(
-        aiconfig, request_json, f"method_", _op, signature
+        aiconfig, request_json, method_name, _op, signature
+    )
+
+
+@app.route("/api/delete_output", methods=["POST"])
+def delete_output() -> FlaskResponse:
+    """
+    Clears a single outputs in the server state's AIConfig based on prompt name.
+    """
+    method_name = MethodName("delete_output")
+    state = get_server_state(app)
+    aiconfig = state.aiconfig
+    request_json = request.get_json()
+
+    if aiconfig is None:
+        LOGGER.info("No AIConfig in memory, can't run clear outputs.")
+        return HttpResponseWithAIConfig(
+            message="No AIConfig in memory, can't run clear outputs.",
+            code=400,
+            aiconfig=None,
+        ).to_flask_format()
+
+    signature: dict[str, Type[Any]] = {"prompt_name": str}
+    operation = make_op_run_method(method_name)
+    return run_aiconfig_operation_with_request_json(
+        aiconfig, request_json, method_name, operation, signature
     )
 
 
@@ -834,6 +874,7 @@ def set_aiconfigrc() -> FlaskResponse:
     # with open(state.aiconfigrc_path, "w") as f:
     #     yaml.dump(request_json["aiconfigrc"], f)
 
+
 @app.route("/api/set_env_file_path", methods=["POST"])
 def set_env_path() -> FlaskResponse:
     """
@@ -848,14 +889,14 @@ def set_env_path() -> FlaskResponse:
 
     # Validate
     request_env_path = request_json.get("env_file_path")
-    
+
     env_file_path_is_valid, message = validate_env_file_path(request_env_path)
 
     if not env_file_path_is_valid:
         return FlaskResponse(
             (
                 {
-                    "message": f'Invalid request, {message}: {request_env_path}',
+                    "message": f"Invalid request, {message}: {request_env_path}",
                 },
                 400,
             )

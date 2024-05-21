@@ -148,7 +148,7 @@ Duplicate the [Gradio Notebook Quickstart Space](https://huggingface.co/spaces/l
 
 #### [manual] Create from scratch
 
-- **Option 2: Create from scratch**. Create a [new Gradio SDK Space](https://huggingface.co/new-space) and add these files to your Space repo. To add files to your Space repo, you can do so through the [Web UI](https://huggingface.co/docs/hub/repositories-getting-started#adding-files-to-a-repository-web-ui) or [terminal](https://huggingface.co/docs/hub/repositories-getting-started#terminal).
+- **Option 2: Create from scratch**. Create a [new Gradio SDK Space](https://huggingface.co/new-space?sdk=gradio) (blank template) and add these files to your Space repo. To add files to your Space repo, you can do so through the [Web UI](https://huggingface.co/docs/hub/repositories-getting-started#adding-files-to-a-repository-web-ui) or [terminal](https://huggingface.co/docs/hub/repositories-getting-started#terminal).
   - [app.py](https://huggingface.co/spaces/lastmileai/gradio-notebook-template/blob/main/app.py)
   - [requirements.txt](https://huggingface.co/spaces/lastmileai/gradio-notebook-template/blob/main/requirements.txt)
 
@@ -230,7 +230,7 @@ You can easily build generative apps inspired by your work in Gradio Notebook Sp
 Use the `aiconfig.json` file in your code with the [AIConfig SDK](https://github.com/lastmile-ai/aiconfig) in 2 lines:
 
 ```python
-config = await AIConfigRuntime.load('my_app.aiconfig.json')
+config = AIConfigRuntime.load('my_app.aiconfig.json')
 model_output = await config.run('prompt_name')
 ```
 

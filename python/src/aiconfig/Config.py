@@ -290,7 +290,7 @@ class AIConfigRuntime(AIConfig):
         prompt_name: str,
         params: Optional[dict] = None,
         options: Optional[InferenceOptions] = None,
-        **kwargs,
+        run_with_dependencies: Optional[bool] = False,
     ):
         """
         Executes the AI model with the resolved parameters and returns the API response.
@@ -309,7 +309,7 @@ class AIConfigRuntime(AIConfig):
                 "prompt_name": prompt_name,
                 "params": params,
                 "options": options,
-                "kwargs": kwargs,
+                "run_with_dependencies": run_with_dependencies,
             },
         )
         await self.callback_manager.run_callbacks(event)
@@ -330,11 +330,7 @@ class AIConfigRuntime(AIConfig):
         self.delete_output(prompt_name)
 
         response = await model_provider.run(
-            prompt_data,
-            self,
-            options,
-            params,
-            **kwargs,  # TODO: We should remove and make argument explicit
+            prompt_data, self, options, params, run_with_dependencies
         )
 
         event = CallbackEvent(
@@ -365,7 +361,7 @@ class AIConfigRuntime(AIConfig):
 
         Raises:
             IndexError: If the identifier for the prompt doesn't exist in the list of available prompts.
-
+            IndexError: If the model name doesn't exist in the list of available model parsers.
         Returns:
             list[Tuple["ExecuteResult", JSONObject | Any, Dict[str, Any]]]: A list of tuples, each tuple consisting of the inference result, the corresponding resolved completion parameters, and the parameters dict used.
 

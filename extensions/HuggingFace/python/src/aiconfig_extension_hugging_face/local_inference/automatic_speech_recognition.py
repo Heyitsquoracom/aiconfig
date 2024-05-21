@@ -118,7 +118,7 @@ class HuggingFaceAutomaticSpeechRecognitionTransformer(ModelParser):
         aiconfig: "AIConfigRuntime",
         options: InferenceOptions,
         parameters: Dict[str, Any],
-        **kwargs,
+        run_with_dependencies: Optional[bool] = False,
     ) -> list[Output]:
         await aiconfig.callback_manager.run_callbacks(
             CallbackEvent(
@@ -128,6 +128,7 @@ class HuggingFaceAutomaticSpeechRecognitionTransformer(ModelParser):
                     "prompt": prompt,
                     "options": options,
                     "parameters": parameters,
+                    "run_with_dependencies": run_with_dependencies,
                 },
             )
         )
@@ -346,9 +347,9 @@ def construct_outputs(response: list[Any]) -> list[Output]:
                 "output_type": "execute_result",
                 "data": text_output,
                 "execution_count": i,
-                "metadata": {"result": result}
-                if result.get("chunks", False)
-                else {},  # may contain timestamps and chunks, for now pass result
+                "metadata": (
+                    {"result": result} if result.get("chunks", False) else {}
+                ),  # may contain timestamps and chunks, for now pass result
             }
         )
         outputs.append(output)

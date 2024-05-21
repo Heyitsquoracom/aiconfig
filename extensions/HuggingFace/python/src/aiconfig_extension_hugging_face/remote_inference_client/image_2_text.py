@@ -223,9 +223,9 @@ class HuggingFaceImage2TextRemoteInference(ModelParser):
         completion_data = refine_completion_params(model_settings)
 
         # Add image input
-        completion_data[
-            "image"
-        ] = validate_and_retrieve_image_from_attachments(prompt)
+        completion_data["image"] = (
+            validate_and_retrieve_image_from_attachments(prompt)
+        )
 
         await aiconfig.callback_manager.run_callbacks(
             CallbackEvent(
@@ -243,7 +243,7 @@ class HuggingFaceImage2TextRemoteInference(ModelParser):
         aiconfig: "AIConfigRuntime",
         options: InferenceOptions,
         parameters: Dict[str, Any],
-        **kwargs,
+        run_with_dependencies: Optional[bool] = False,
     ) -> list[Output]:
         """
         Invoked to run a prompt in the .aiconfig. This method should perform
@@ -270,6 +270,7 @@ class HuggingFaceImage2TextRemoteInference(ModelParser):
                     "prompt": prompt,
                     "options": sanitized_options,
                     "parameters": parameters,
+                    "run_with_dependencies": run_with_dependencies,
                 },
             )
         )
