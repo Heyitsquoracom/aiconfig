@@ -15,7 +15,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Get assistant response based on user prompt (prompt routing)
 async def assistant_response(prompt):
-    config = AIConfigRuntime.load("assistant_aiconfig.json")
+    config = AIConfigRuntime.load("assistant.aiconfig.json")
 
     params = {"student_question": prompt}
 
